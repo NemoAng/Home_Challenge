@@ -27,13 +27,14 @@ const fetchPokemon = async () => {
   }
 };
 
-const fetchSprint = async (id: number) => {
+
+const fetchSprint = async (name: string) => {
   try {
     // Correction 1: The second argument to fetch() should be an options object.
     // You passed '{id}', which is incorrect.
     // For a simple GET request, you usually don't need options unless you're
     // using an AbortSignal or specific headers.
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`); // Added trailing slash for consistency
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`); // Added trailing slash for consistency
 
     // Check if the response was successful (status code 200-299)
     if (!response.ok) {
@@ -48,20 +49,29 @@ const fetchSprint = async (id: number) => {
     // 'data.results' is typically found when fetching a *list* of resources, like /pokemon/ or /pokemon?limit=20.
     // For a single Pokémon, 'data' *is* the Pokémon object.
     // console.log('Fetched Sprint data:', data.sprites); // Log the fetched data
-    return data.sprites; // Return the Pokémon data object directly
+    var sprites_data = {
+      name: name,
+      stats: data['stats'][0]['base_stat'],
+      front_sprites: data['sprites']['front_default'],
+      back_sprites: data['sprites']['back_default'],
+      primary_type: data['types'][0]['type']['name'],
+      cry: data['cries']['legacy'],
+      moves: data['moves']
+    }
+    return sprites_data; // Return the Pokémon data object directly
   } catch (err: any) {
     // This part is fine for error handling within the function
     if (err.name === 'AbortError') {
       console.log('Fetch aborted'); // This would only trigger if you passed an AbortSignal
     } else {
-      console.error(`Failed to fetch sprint (Pokemon ID ${id}): ${err.message}`); // Log error message
+      console.error(`Failed to fetch sprint (Pokemon ${name}): ${err.message}`); // Log error message
       // If you're using this in a React component, you might want to return null or
       // re-throw the error so the calling component can handle the error state.
       return null; // Or throw err;
     }
   } finally {
     // This part is fine for logging completion
-    console.log(`Fetch attempt for Pokemon ID ${id} completed`); // Log completion
+    console.log(`Fetch attempt for Pokemon ${name} completed`); // Log completion
   }
 };
 

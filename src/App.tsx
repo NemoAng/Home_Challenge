@@ -32,15 +32,17 @@ function Test() {
 
 
 function App() {
-  const regex = /pokemon\/(\d+)\//;
+  const regex = React.useMemo(() => /pokemon\/(\d+)\//, []);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [pokemonData, setPokemonData] = useState<any[]>([]);
   const [spriteData, setSpriteData] = useState<any[]>([]);
-  const [pokemon1, setPokemon1] = useState<any>(0);
-  const [pokemon2, setPokemon2] = useState<any>(1);
+  const [sprite1, setSprite1] = useState<any>(0);
+  const [sprite2, setSprite2] = useState<any>(1);
 
   const logZoneRef = useRef<LogZoneHandle>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audio_download = 600;
 
   useEffect(() => {
     if (pokemonData.length > 0) {
@@ -62,7 +64,7 @@ function App() {
       setPokemonData(_pokemons);
 
       _pokemons.forEach((pokemon: any) => {
-        fetchSprint(pokemon.url).then(sprite => {
+        fetchSprint(pokemon.name).then(sprite => {
           setSpriteData(prev => [...prev, sprite]);
           // console.log(`Fetched sprite for ${pokemon.name}:`, sprite);
         }).catch(err => {
@@ -74,32 +76,61 @@ function App() {
     }).catch(err => {
       console.error('Failed to fetch sprite data:', err);
     });
-  }, []);
+  }, [pokemonData.length, regex]);
 
   const onStartBattle = () => {
     // setIsLoading(true);
-    const [pokemon1, pokemon2] = getTwoUniqueNumbersFromArray(pokemonData.length);
+    const [_sprite1, _sprite2] = getTwoUniqueNumbersFromArray(spriteData.length);
 
-    // console.log(`Selected Pokemon indices: ${pokemon1}, ${pokemon2}`);
     // console.log('Battle started!....', pokemonData);
-    setPokemon1(pokemon1);
-    setPokemon2(pokemon2);
+    setSprite1(_sprite1);
+    setSprite2(_sprite2);
+
+    handlePlay(audioRef.current);
 
     if (logZoneRef.current) { // <-- Added this check
-      logZoneRef.current.addLogMessage(`${pokemonData[pokemon1].name} vs ${pokemonData[pokemon2].name},${pokemonData[pokemon1].name} WINS!`);
+      console.log(spriteData[_sprite1].stats, spriteData[_sprite2].stats);
+
+      if (spriteData[_sprite1].stats > spriteData[_sprite2].stats) {
+        logZoneRef.current.addLogMessage(`${spriteData[_sprite1].name} ${spriteData[_sprite1].moves[0].move.name} ${spriteData[_sprite2].name}, ${spriteData[_sprite1].name} WINS!`);
+      } else {
+        logZoneRef.current.addLogMessage(`${spriteData[_sprite2].name} ${spriteData[_sprite2].moves[0].move.name} ${spriteData[_sprite1].name}, ${spriteData[_sprite2].name} WINS!`);
+      }
     }
     // setIsLoading(false);
   }
 
-  if (!isLoading) {
+  // Function to handle playing the audio
+  const handlePlay = (audio: HTMLAudioElement | null) => {
+    // Check if the ref currently points to an audio element
+    if (audio) {
+      setTimeout(() => {
+        audio.play()
+          .then(() => {
+            console.log('Audio started playing.');
+            // setIsPlaying(true); // Update state to reflect playing status
+          })
+          .catch((error: any) => {
+            // Handle potential errors, e.g., user hasn't interacted yet,
+            // or browser policy blocks autoplay without user interaction.
+            console.error('Error attempting to play audio:', error);
+          });
+      }, audio_download); // Optional delay before playing audio
+    }
+  };
+
+  if (!isLoading && spriteData.length > 1) {
+    var winner = sprite1 > sprite2 ? sprite1 : sprite2;
+    // console.log('🥰', spriteData, sprite1, sprite2, winner);
+
     return (
       <>
         <div>
-          <Fighter fighter={{ animal: pokemonData[pokemon1].name, weapon: "Thunderbolt", power: 9001 }} img="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/16.svg" />
+          <Fighter fighter={{ animal: spriteData[sprite1].name, weapon: spriteData[sprite1].moves[0].move.name, power: spriteData[sprite1].stats }} img={spriteData[sprite1].front_sprites} />
         </div>
 
         <div>
-          <Fighter fighter={{ animal: pokemonData[pokemon2].name, weapon: "Thunderbolt2", power: 1001, arrow_right: false }} img="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/16.svg" />
+          <Fighter fighter={{ animal: spriteData[sprite2].name, weapon: spriteData[sprite2].moves[0].move.name, power: spriteData[sprite2].stats, arrow_right: false }} img={spriteData[sprite2].front_sprites} />
         </div>
 
         <div className='log-zone'>
@@ -107,6 +138,7 @@ function App() {
             <LogZone ref={logZoneRef} />
           </div>
           <div className='log-right'>
+            <audio className='audio' src={spriteData[winner].cry} preload="metadata" ref={audioRef} controls></audio>
             <BattleStart label="Start Battle!" onClick={ onStartBattle } />
           </div>
         </div>

@@ -44,24 +44,22 @@ const LogZone = forwardRef<LogZoneHandle, {}>((props, ref) => {
       <textarea
         ref={textareaRef}
         value={text}
-        // 注意：这里仍然绑定内部的 handleChangeInternal，
-        // 父组件通过 ref 调用暴露的 handleChange 是另一种触发方式。
-        // 如果父组件需要完全控制输入，那么 LogZone 就不能是受控组件。
-        // 通常，如果父组件想“代替”子组件处理输入，那么子组件的 value 和 onChange 应该由父组件通过 props 传递。
-        onChange={handleChangeInternal} // 子组件内部处理用户输入
-        readOnly // 保持只读以作为日志区，除非你需要父组件来管理用户输入
+
+        onChange={handleChangeInternal}
+        readOnly
         style={{
           width: '100%',
           height: "calc(100% - 2.5em - 20px)",
-          resize: 'vertical',
+          resize: 'none',
           padding: '10px',
           border: '1px solid #007bff',
           borderRadius: '5px',
           boxSizing: 'border-box',
-          fontFamily: 'monospace',
+          // fontFamily: 'monospace',
+          fontSize: '1.5em',
           overflowY: 'auto',
           display: 'block',
-          minHeight: '200px',
+          // minHeight: '200px',
           maxHeight: '400px',
         }}
       />

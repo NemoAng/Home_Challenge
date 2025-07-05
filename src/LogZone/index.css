@@ -4,4 +4,12 @@
   border-radius: 8px;
   height: 100%;
   width: 100%;
+  border: 2px solid black;
+}
+
+.log_div h3 {
+  margin: 10px 0;
+  padding: 0;
+  font-size: 1.2em;
+  color: #333;
 }
