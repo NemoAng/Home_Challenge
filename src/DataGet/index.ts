@@ -30,9 +30,6 @@ const fetchPokemon = async () => {
 
 const fetchSprint = async (name: string) => {
   try {
-    // Correction 1: The second argument to fetch() should be an options object.
-    // You passed '{id}', which is incorrect.
-    // For a simple GET request, you usually don't need options unless you're
     // using an AbortSignal or specific headers.
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`); // Added trailing slash for consistency
 
@@ -43,11 +40,6 @@ const fetchSprint = async (name: string) => {
     }
 
     const data = await response.json(); // Parse the JSON response
-
-    // Correction 2: The PokeAPI endpoint for a single Pokémon (e.g., /pokemon/1/)
-    // returns the data for *that specific Pokémon directly*, not an object with a 'results' array.
-    // 'data.results' is typically found when fetching a *list* of resources, like /pokemon/ or /pokemon?limit=20.
-    // For a single Pokémon, 'data' *is* the Pokémon object.
     // console.log('Fetched Sprint data:', data.sprites); // Log the fetched data
     var sprites_data = {
       name: name,
@@ -65,8 +57,6 @@ const fetchSprint = async (name: string) => {
       console.log('Fetch aborted'); // This would only trigger if you passed an AbortSignal
     } else {
       console.error(`Failed to fetch sprint (Pokemon ${name}): ${err.message}`); // Log error message
-      // If you're using this in a React component, you might want to return null or
-      // re-throw the error so the calling component can handle the error state.
       return null; // Or throw err;
     }
   } finally {

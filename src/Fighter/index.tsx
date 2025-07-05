@@ -33,7 +33,7 @@ const Fighter: React.FC<FighterProps> = ({
               arrow_right={fighter.arrow_right}
             />
           <div className="fighter-controls">
-            <img src={img} alt="Fighter Image" />
+            <img src={img} alt="Fighter" />
           </div>
         </>)}
     </div>

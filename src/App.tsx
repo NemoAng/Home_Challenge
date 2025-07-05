@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
 import Fighter from './Fighter';
-// import { LogZone } from './LogZone';
-import LogZone, { LogZoneHandle } from './LogZone'; // 确保导入 LogZoneHandle
+import LogZone, { LogZoneHandle } from './LogZone';
 
 import BattleStart from './BattleStart';
 import './App.css';
 
-import { FighterStatus, type FighterStatusProps } from './Fighter/FighterStatus';
+import { FighterStatus } from './Fighter/FighterStatus';
 import { fetchPokemon, fetchSprint } from './DataGet/';
 import getTwoUniqueNumbersFromArray from './Tools';
 
@@ -52,10 +50,6 @@ function App() {
 
     setIsPlaying(true); // Set playing state
     setTriggerAnimation(prev => prev + 1); // Increment to re-trigger useEffect
-
-    // console.log('Animation triggered!');
-
-    // After the animation duration (3 seconds), reset playing state
     setTimeout(() => {
       setIsPlaying(false);
       // console.log('Animation ended, ready for next click.');
@@ -115,25 +109,7 @@ function App() {
   }, [pokemonData.length, regex]);
 
   const onStartBattle = () => {
-    // setIsLoading(true);
     handlePlayAnimation();
-
-    // const [_sprite1, _sprite2] = getTwoUniqueNumbersFromArray(spriteData.length);
-    // setSprite1(_sprite1);
-    // setSprite2(_sprite2);
-
-    // handlePlay(audioRef.current);
-
-    // if (logZoneRef.current) { // <-- Added this check
-    //   console.log(spriteData[_sprite1].stats, spriteData[_sprite2].stats);
-
-    //   if (spriteData[_sprite1].stats > spriteData[_sprite2].stats) {
-    //     logZoneRef.current.addLogMessage(`${spriteData[_sprite1].name} ${spriteData[_sprite1].moves[0].move.name} ${spriteData[_sprite2].name}, ${spriteData[_sprite1].name} WINS!`);
-    //   } else {
-    //     logZoneRef.current.addLogMessage(`${spriteData[_sprite2].name} ${spriteData[_sprite2].moves[0].move.name} ${spriteData[_sprite1].name}, ${spriteData[_sprite2].name} WINS!`);
-    //   }
-    // }
-    // setIsLoading(false);
   }
 
   // Function to handle playing the audio
@@ -157,16 +133,12 @@ function App() {
 
   if (!isLoading && spriteData.length > 1) {
     var winner = sprite1 > sprite2 ? sprite1 : sprite2;
-    // console.log('🥰', spriteData, sprite1, sprite2, winner);
 
     return (
       <>
         <div className='upper'>
           <div className='overlay'>
             <div className='overlay-left'></div>
-            {/* <div className='overlay-middle is-expanded'></div> */}
-            {/* <div className={`overlay-middle ${isMiddleExpanded ? 'is-expanded' : ''}`}></div>
-            */}
             <div key={triggerAnimation} className={`overlay-middle animate-reset`}></div>
             <div className='overlay-right'></div>
           </div>

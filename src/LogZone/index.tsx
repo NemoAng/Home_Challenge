@@ -2,22 +2,16 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 
 import './index.css'; // Assuming this CSS file exists and has styles for .log_div
 
-// 定义暴露给父组件的句柄接口
-// 注意：将 handleChange 也添加进来
 export interface LogZoneHandle {
   addLogMessage: (message: string) => void;
-  // **新增**：暴露 handleChange 函数
   handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  // 其他你可能想暴露的方法
-  // scrollToBottom: () => void;
-  // getLogContent: () => string;
+
 }
 
 const LogZone = forwardRef<LogZoneHandle, {}>((props, ref) => {
   const [text, setText] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // **关键**：将 handleChange 也添加到 useImperativeHandle 的返回对象中
   useImperativeHandle(ref, () => ({
     addLogMessage: (message: string) => {
       setText(prevText => prevText + (prevText ? '\n' : '') + message);
@@ -33,7 +27,6 @@ const LogZone = forwardRef<LogZoneHandle, {}>((props, ref) => {
     }
   }, [text]);
 
-  // handleChange 仍然在 LogZone 内部定义和使用，同时通过 useImperativeHandle 暴露出去
   const handleChangeInternal = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
   };
