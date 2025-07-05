@@ -44,9 +44,45 @@ function App() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const audio_download = 600;
 
+  const [triggerAnimation, setTriggerAnimation] = useState(0); // Use a number to trigger useEffect
+  const [isPlaying, setIsPlaying] = useState(false); // To prevent rapid clicks during animation
+
+  const handlePlayAnimation = () => {
+    if (isPlaying) return; // Prevent new animation if one is already playing
+
+    setIsPlaying(true); // Set playing state
+    setTriggerAnimation(prev => prev + 1); // Increment to re-trigger useEffect
+
+    // console.log('Animation triggered!');
+
+    // After the animation duration (3 seconds), reset playing state
+    setTimeout(() => {
+      setIsPlaying(false);
+      // console.log('Animation ended, ready for next click.');
+
+      const [_sprite1, _sprite2] = getTwoUniqueNumbersFromArray(spriteData.length);
+      setSprite1(_sprite1);
+      setSprite2(_sprite2);
+
+      handlePlay(audioRef.current);
+
+      if (logZoneRef.current) { // <-- Added this check
+        console.log(spriteData[_sprite1].stats, spriteData[_sprite2].stats);
+
+        if (spriteData[_sprite1].stats > spriteData[_sprite2].stats) {
+          logZoneRef.current.addLogMessage(`${spriteData[_sprite1].name} ${spriteData[_sprite1].moves[0].move.name} ${spriteData[_sprite2].name}, ${spriteData[_sprite1].name} WINS!`);
+        } else {
+          logZoneRef.current.addLogMessage(`${spriteData[_sprite2].name} ${spriteData[_sprite2].moves[0].move.name} ${spriteData[_sprite1].name}, ${spriteData[_sprite2].name} WINS!`);
+        }
+      }
+
+    }, 2000); // Match animation-duration
+  };
+
+
   useEffect(() => {
     if (pokemonData.length > 0) {
-      console.log('Pokemon data already fetched:');
+      // console.log('Pokemon data already fetched:');
       return;
     }
 
@@ -80,23 +116,23 @@ function App() {
 
   const onStartBattle = () => {
     // setIsLoading(true);
-    const [_sprite1, _sprite2] = getTwoUniqueNumbersFromArray(spriteData.length);
+    handlePlayAnimation();
 
-    // console.log('Battle started!....', pokemonData);
-    setSprite1(_sprite1);
-    setSprite2(_sprite2);
+    // const [_sprite1, _sprite2] = getTwoUniqueNumbersFromArray(spriteData.length);
+    // setSprite1(_sprite1);
+    // setSprite2(_sprite2);
 
-    handlePlay(audioRef.current);
+    // handlePlay(audioRef.current);
 
-    if (logZoneRef.current) { // <-- Added this check
-      console.log(spriteData[_sprite1].stats, spriteData[_sprite2].stats);
+    // if (logZoneRef.current) { // <-- Added this check
+    //   console.log(spriteData[_sprite1].stats, spriteData[_sprite2].stats);
 
-      if (spriteData[_sprite1].stats > spriteData[_sprite2].stats) {
-        logZoneRef.current.addLogMessage(`${spriteData[_sprite1].name} ${spriteData[_sprite1].moves[0].move.name} ${spriteData[_sprite2].name}, ${spriteData[_sprite1].name} WINS!`);
-      } else {
-        logZoneRef.current.addLogMessage(`${spriteData[_sprite2].name} ${spriteData[_sprite2].moves[0].move.name} ${spriteData[_sprite1].name}, ${spriteData[_sprite2].name} WINS!`);
-      }
-    }
+    //   if (spriteData[_sprite1].stats > spriteData[_sprite2].stats) {
+    //     logZoneRef.current.addLogMessage(`${spriteData[_sprite1].name} ${spriteData[_sprite1].moves[0].move.name} ${spriteData[_sprite2].name}, ${spriteData[_sprite1].name} WINS!`);
+    //   } else {
+    //     logZoneRef.current.addLogMessage(`${spriteData[_sprite2].name} ${spriteData[_sprite2].moves[0].move.name} ${spriteData[_sprite1].name}, ${spriteData[_sprite2].name} WINS!`);
+    //   }
+    // }
     // setIsLoading(false);
   }
 
@@ -125,21 +161,33 @@ function App() {
 
     return (
       <>
-        <div>
-          <Fighter fighter={{ animal: spriteData[sprite1].name, weapon: spriteData[sprite1].moves[0].move.name, power: spriteData[sprite1].stats }} img={spriteData[sprite1].front_sprites} />
-        </div>
-
-        <div>
-          <Fighter fighter={{ animal: spriteData[sprite2].name, weapon: spriteData[sprite2].moves[0].move.name, power: spriteData[sprite2].stats, arrow_right: false }} img={spriteData[sprite2].front_sprites} />
-        </div>
-
-        <div className='log-zone'>
-          <div className='log-left'>
-            <LogZone ref={logZoneRef} />
+        <div className='upper'>
+          <div className='overlay'>
+            <div className='overlay-left'></div>
+            {/* <div className='overlay-middle is-expanded'></div> */}
+            {/* <div className={`overlay-middle ${isMiddleExpanded ? 'is-expanded' : ''}`}></div>
+            */}
+            <div key={triggerAnimation} className={`overlay-middle animate-reset`}></div>
+            <div className='overlay-right'></div>
           </div>
-          <div className='log-right'>
-            <audio className='audio' src={spriteData[winner].cry} preload="metadata" ref={audioRef} controls></audio>
-            <BattleStart label="Start Battle!" onClick={ onStartBattle } />
+          <div>
+            <Fighter fighter={{ animal: spriteData[sprite1].name, weapon: spriteData[sprite1].moves[0].move.name, power: spriteData[sprite1].stats }} img={spriteData[sprite1].front_sprites} />
+          </div>
+
+          <div>
+            <Fighter fighter={{ animal: spriteData[sprite2].name, weapon: spriteData[sprite2].moves[0].move.name, power: spriteData[sprite2].stats, arrow_right: false }} img={spriteData[sprite2].front_sprites} />
+          </div>
+        </div>
+
+        <div className='bottom'>
+          <div className='log-zone'>
+            <div className='log-left'>
+              <LogZone ref={logZoneRef} />
+            </div>
+            <div className='log-right'>
+              <audio className='audio' src={spriteData[winner].cry} preload="metadata" ref={audioRef} controls></audio>
+              <BattleStart label="Start Battle!" onClick={onStartBattle} />
+            </div>
           </div>
         </div>
       </>

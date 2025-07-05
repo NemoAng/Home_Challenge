@@ -27,3 +27,91 @@
 .audio {
   display: none;
 }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+}
+
+.overlay-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black
+}
+
+.overlay-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+}
+
+.overlay-middle {
+  /* Default state: always expanded */
+  flex-grow: 100;
+  /* Default flex-grow is now 100 */
+  flex-basis: auto;
+  /* Allow flex-grow to control size */
+  /* Example color */
+  color: white;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  opacity: 1;
+  /* Default opacity is 1 */
+  transform: scaleX(1);
+  /* Default scaleX is 1 */
+
+  /* Ensure initial state transitions smoothly if changed by JS before animation */
+  transition: flex-grow 0.01s, flex-basis 0.01s, opacity 0.01s, transform 0.01s;
+}
+
+/* This class will trigger the animation. */
+.overlay-middle.animate-reset {
+  animation-name: middleGrowShrinkGrowReset;
+  animation-duration: 3s;
+  /* Total duration: 3 seconds */
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  /* Play once */
+  animation-fill-mode: forwards;
+  /* Crucial: Stay at 100% keyframe after animation */
+}
+
+/* Keyframes for the 100 -> 0 -> 100 animation */
+@keyframes middleGrowShrinkGrowReset {
+  0% {
+    /* Start at 100% (already the default state, but explicitly set for animation start) */
+    flex-grow: 100;
+    flex-basis: auto;
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  50% {
+    /* Shrink to 0 in the middle */
+    flex-grow: 0;
+    flex-basis: 0;
+    opacity: 0.5;
+    transform: scaleX(0.5);
+  }
+
+  100% {
+    /* Grow back to 100% at the end */
+    flex-grow: 100;
+    flex-basis: auto;
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
