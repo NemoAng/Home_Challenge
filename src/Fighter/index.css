@@ -1,0 +1,16 @@
+.fighter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fighter-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.img-reverse {
+  transform: scaleX(-1);
+}
